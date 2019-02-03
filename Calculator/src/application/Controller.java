@@ -3,13 +3,17 @@ package application;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Pane;
 
-public class Controller {
+public class Controller   {
 
+	@FXML 
+	private Pane canvas;
+	
 	@FXML
 	private TextField veiwArea;
+	
 
 	@FXML
 	private GridPane numPad;
@@ -29,29 +33,9 @@ public class Controller {
 	@FXML
 	private Button butEnter;
 
-	String currentNum = "";
-
-	Mod mod = null;
-	String operator = "";
-	double[] number = new double[2];
-	String formula = number[0] + operator + number[1] + " = ";
-
-	public double math(double a, double b) {
-
-		switch (mod) {
-
-		case Add:
-			return (double) number[0] + number[1];
-		case Subtract:
-			return (double) number[0] - number[1];
-		case Divid:
-			return (double) number[0] / number[1];
-		case Multiply:
-			return (double) number[0] * number[1];
-		}
-
-		return -404;
-	}
+	public static String currentNum = "";
+	private static String operator = "";
+	String formula;
 
 	public void butten1() {
 		currentNum += "1";
@@ -97,91 +81,67 @@ public class Controller {
 		currentNum += "9";
 		veiwArea.setText(currentNum);
 	}
-
+	
 	public void butten0() {
 		currentNum += "0";
 		veiwArea.setText(currentNum);
 	}
 
 	public void buttenDivid() {
-
-		if (mod == null && currentNum.equals("")) {
-			return;
-		} else {
-
-			number[0] = Double.parseDouble(currentNum);
-			currentNum = "";
-		}
-
-		mod = Mod.Divid;
+		Calculator.divid(currentNum);
+		currentNum = "";
 		operator = " / ";
-
 		veiwArea.setText(currentNum);
+		lockMods(true);
 	}
 
 	public void buttenMultipy() {
-
-		if (mod == null && currentNum.equals("")) {
-			return;
-		}
-
-		else {
-			number[0] = Double.parseDouble(currentNum);
-			currentNum = "";
-		}
-
-		mod = Mod.Multiply;
+		Calculator.multiply(currentNum);
+		currentNum = "";
 		operator = " * ";
-
 		veiwArea.setText(currentNum);
+		lockMods(true);
 	}
 
 	public void buttenSubtract() {
-
-		if (mod == null && currentNum.equals("")) {
-			return;
-		} else {
-			number[0] = Double.parseDouble(currentNum);
-			currentNum = "";
-		}
-
-		mod = Mod.Subtract;
+		Calculator.subtract(currentNum);
+		currentNum = "";
 		operator = " - ";
-
 		veiwArea.setText(currentNum);
+		lockMods(true);
 	}
 
 	public void buttenAdd() {
-
-		if (mod == null && currentNum.equals("")) {
-			return;
-		} else {
-			number[0] = Double.parseDouble(currentNum);
-			currentNum = "";
-		}
-
-		mod = Mod.Add;
+		Calculator.add(currentNum);
+		currentNum = "";
 		operator = " + ";
-
 		veiwArea.setText(currentNum);
+		lockMods(true);
 	}
 
 	public void buttenEnter() {
 
-		if (mod == null) {
+		if (operator.equals("")) {
 			veiwArea.setText(currentNum);
 		} else {
 
-			number[1] = Double.parseDouble(currentNum);
-			currentNum = "";
-
-			double value = math(number[0], number[1]);
-
-			formula = number[0] + operator + number[1] + " = ";
-
-			veiwArea.setText(formula + value);
-			currentNum = value + "";
-			resetVars();
+			if (currentNum.equals("")) {
+				veiwArea.setText("error");
+				currentNum = "";
+				resetVars();
+			}
+			else {
+				Calculator.getNumsArray()[1] = Double.parseDouble(currentNum);
+				currentNum = "";
+	
+				double value = Calculator.calculate();
+	
+				formula = Calculator.getNumsArray()[0] + operator + Calculator.getNumsArray()[1] + " = ";
+	
+				veiwArea.setText(formula + value);
+				currentNum = value + "";
+				resetVars();
+			}
 		}
 
 	}
@@ -205,127 +165,138 @@ public class Controller {
 
 	public void resetVars() {
 		formula = "";
-		mod = null;
 		operator = "";
-		number[0] = 0;
-		number[1] = 0;
+		Calculator.setMod(null);
+		Calculator.getNumsArray()[0] = 0;
+		Calculator.getNumsArray()[1] = 0;
 	}
+
 	
-	@FXML
-	public void keyPressed(KeyEvent e) {
-		
-		switch (e.getCode()) {
-		
-		case DIGIT1 : 
-			butten1();
-			break;
-			
-		case DIGIT2: 
-			butten2();
-			break;
-			
-		case DIGIT3: 
-			butten3();
-			break;
-			
-		case DIGIT4: 
-			butten4();
-			break;
-			
-		case DIGIT5: 
-			butten5();
-			break;
-		
-		case DIGIT6: 
-			butten6();
-			break;
-		
-		case DIGIT7: 
-			butten7();
-			break;
-		
-		case DIGIT8: 
-			butten8();
-			break;
-		
-		case DIGIT9: 
-			butten9();
-			break;
-		
-		case DIGIT0: 
-			butten0();
-			break;
-		
-		case ADD: 
-			buttenAdd();
-			break;
-		
-		case SUBTRACT: 
-			buttenSubtract();
-			break;
-		
-		case DIVIDE: 
-			buttenDivid();
-			break;
-		
-		case MULTIPLY: 
-			buttenMultipy();
-			break;
-		
-		case ENTER: 
-			buttenEnter();
-			break;
-		
-		case BACK_SPACE: 
-			buttenClear();
-			break;
-			
-		case NUMPAD1 : 
-			butten1();
-			break;
-			
-		case NUMPAD2: 
-			butten2();
-			break;
-			
-		case NUMPAD3: 
-			butten3();
-			break;
-			
-		case NUMPAD4: 
-			butten4();
-			break;
-			
-		case NUMPAD5: 
-			butten5();
-			break;
-		
-		case NUMPAD6: 
-			butten6();
-			break;
-		
-		case NUMPAD7: 
-			butten7();
-			break;
-		
-		case NUMPAD8: 
-			butten8();
-			break;
-		
-		case NUMPAD9: 
-			butten9();
-			break;
-		
-		case NUMPAD0: 
-			butten0();
-			break;		
-		
-		default:
-			System.out.println("invalid key entered.");
-			break;
-		
-		}
-				
-	}
+//	
+//	@FXML 
+//	public void keyPressed() {
+//		veiwArea.setOnKeyPressed(new EventHandler<KeyEvent>() {
+//		
+//
+//			@Override
+//			public void handle(KeyEvent e) {
+//				// TODO Auto-generated method stub
+//				
+//				switch ( e.getCode()) {
+//
+//				case DIGIT1:
+//					butten1();
+//					break;
+//
+//				case DIGIT2:
+//					butten2();
+//					break;
+//
+//				case DIGIT3:
+//					butten3();
+//					break;
+//
+//				case DIGIT4:
+//					butten4();
+//					break;
+//
+//				case DIGIT5:
+//					butten5();
+//					break;
+//
+//				case DIGIT6:
+//					butten6();
+//					break;
+//
+//				case DIGIT7:
+//					butten7();
+//					break;
+//
+//				case DIGIT8:
+//					butten8();
+//					break;
+//
+//				case DIGIT9:
+//					butten9();
+//					break;
+//
+//				case DIGIT0:
+//					butten0();
+//					break;
+//
+//				case ADD:
+//					buttenAdd();
+//					break;
+//
+//				case SUBTRACT:
+//					buttenSubtract();
+//					break;
+//
+//				case DIVIDE:
+//					buttenDivid();
+//					break;
+//
+//				case MULTIPLY:
+//					buttenMultipy();
+//					break;
+//
+//				case ENTER:
+//					buttenEnter();
+//					break;
+//
+//				case BACK_SPACE:
+//					buttenClear();
+//					break;
+//
+//				case NUMPAD1:
+//					butten1();
+//					break;
+//
+//				case NUMPAD2:
+//					butten2();
+//					break;
+//
+//				case NUMPAD3:
+//					butten3();
+//					break;
+//
+//				case NUMPAD4:
+//					butten4();
+//					break;
+//
+//				case NUMPAD5:
+//					butten5();
+//					break;
+//
+//				case NUMPAD6:
+//					butten6();
+//					break;
+//
+//				case NUMPAD7:
+//					butten7();
+//					break;
+//
+//				case NUMPAD8:
+//					butten8();
+//					break;
+//
+//				case NUMPAD9:
+//					butten9();
+//					break;
+//
+//				case NUMPAD0:
+//					butten0();
+//					break;
+//
+//				default:
+//					System.out.println("invalid key entered.");
+//					break;
+//
+//				}
+//			}
+//		});
+//		
+//
+//	}
 
 }
